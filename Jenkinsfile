@@ -1,4 +1,13 @@
 pipeline {
+    environment {
+
+            registry = "kturner204/calculater"
+
+            registryCredential = 'dockerhub'
+
+            dockerImage=''
+
+    }
     agent any
     tools {
         maven 'apache maven 3.6.3'
@@ -42,5 +51,25 @@ pipeline {
             }
         }
 
+        stage ('Deploy Image') {
+             steps {
+                script {
+                    docker.withRegistry('', registryCredential) {
+                    dockerImage.push()
+                }
+            }
+        }
+        stage ('Remove unused docker image') {
+            steps {
+                sh "docker rmi $registry:$BUILD_NUMBER"
+            }
+        }
+    }
+    post {
+        failure{
+            mail to: 'youremail@gmail.com',
+            subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+            body: "Something is wrong with ${env.BUILD_URL}"
+        }
     }
 }
