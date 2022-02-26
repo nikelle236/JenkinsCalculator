@@ -1,9 +1,6 @@
 import java.util.UUID;
 
 class Calculator {
-
-    BROKEN
-
     Calculator(){
 
     }
